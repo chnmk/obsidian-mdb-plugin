@@ -1,4 +1,4 @@
-import { App, Modal, Notice, Plugin, Setting } from 'obsidian';
+import { App, ButtonComponent, Modal, Notice, Plugin, Setting } from 'obsidian';
 
 // https://docs.obsidian.md/
 // https://docs.obsidian.md/Reference/TypeScript+API/Setting
@@ -36,32 +36,53 @@ class MDBCreateNote extends Modal {
   
 	onOpen() {
 		const { contentEl } = this;
-	
-		contentEl.createEl("h1", { text: "What's your name?" });
-	
-		new Setting(contentEl)
-			.setName("Name")
-			.addText((text) =>
-			text.onChange((value) => {
-				this.noteName = value
-			}));
 
-		new Setting(contentEl)
-			.setName("Description_temp")
-			.addText((text) =>
-			text.onChange((value) => {
-				this.noteDesc = value
-			}));
-	
-	  new Setting(contentEl)
-		.addButton((btn) =>
-		  btn
-			.setButtonText("Submit")
+
+		contentEl.createEl("h1", { text: "MDB Plugin" });
+
+		const buttonEl = this.contentEl.createDiv(
+            "sample-button-element"
+        );
+		new ButtonComponent(buttonEl)
+			.setButtonText("Add artist")
 			.setCta()
 			.onClick(() => {
-			  this.close();
-			  this.onSubmit(this.noteName, this.noteDesc);
-			}));
+				
+				contentEl.createEl("h1", { text: "What's your name?" });
+	
+				new Setting(contentEl)
+					.setName("Name")
+					.addText((text) =>
+					text.onChange((value) => {
+						this.noteName = value
+					}));
+		
+				new Setting(contentEl)
+					.setName("Description_temp")
+					.addText((text) =>
+					text.onChange((value) => {
+						this.noteDesc = value
+					}));
+	
+				new Setting(contentEl)
+				.addButton((btn) =>
+					btn
+					.setButtonText("Submit")
+					.setCta()
+					.onClick(() => {
+						this.close();
+						this.onSubmit(this.noteName, this.noteDesc);
+					}));
+
+			});
+
+		new ButtonComponent(buttonEl)
+		.setButtonText("Add song")
+		.setCta()
+		.onClick(() => {
+			this.close()
+		});
+
 	}
   
 	onClose() {
