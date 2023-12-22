@@ -9,11 +9,16 @@ export default class MDBPlugin extends Plugin {
 		// This creates an icon in the left ribbon.
 		this.addRibbonIcon('file-volume', 'MusicDB Plugin', (evt: MouseEvent) => {
 			// Called when the user clicks the icon.
+
+			/*
 			new MDBCreateNote(this.app, (noteName, noteDesc) => {
 				new Notice(`Note "${noteName}" created!`);
 				this.app.vault.create(`${noteName}.md`, noteDesc)
 			  }).open()
+			*/
 			
+			new MDBSelectAction(this.app).open()
+
 		});
 		
 	}
@@ -23,6 +28,40 @@ export default class MDBPlugin extends Plugin {
 	}
 
 }
+
+class MDBSelectAction extends Modal {
+
+	onOpen() {
+
+		const { contentEl } = this;
+		contentEl.createEl("h1", { text: "MDB Plugin" });
+
+		const buttonEl = this.contentEl.createDiv(
+            "sample-button-element"
+        );	
+
+		new ButtonComponent(buttonEl)
+		.setButtonText("Add artist")
+		.setCta()
+		.onClick(() => {
+			this.close()
+			new MDBCreateNote(this.app, (noteName, noteDesc) => {
+				new Notice(`Note "${noteName}" created!`);
+				this.app.vault.create(`${noteName}.md`, noteDesc)
+			  }).open()
+		});
+
+		new ButtonComponent(buttonEl)
+		.setButtonText("Add song")
+		.setCta()
+		.onClick(() => {
+			this.close()
+		});
+
+	}
+
+}
+
 
 class MDBCreateNote extends Modal {
 	noteName: string;
@@ -37,51 +76,31 @@ class MDBCreateNote extends Modal {
 	onOpen() {
 		const { contentEl } = this;
 
+		contentEl.createEl("h1", { text: "What's your name?" });
 
-		contentEl.createEl("h1", { text: "MDB Plugin" });
+		new Setting(contentEl)
+			.setName("Name")
+			.addText((text) =>
+			text.onChange((value) => {
+				this.noteName = value
+			}));
 
-		const buttonEl = this.contentEl.createDiv(
-            "sample-button-element"
-        );
-		new ButtonComponent(buttonEl)
-			.setButtonText("Add artist")
+		new Setting(contentEl)
+			.setName("Description_temp")
+			.addText((text) =>
+			text.onChange((value) => {
+				this.noteDesc = value
+			}));
+
+		new Setting(contentEl)
+		.addButton((btn) =>
+			btn
+			.setButtonText("Submit")
 			.setCta()
 			.onClick(() => {
-				
-				contentEl.createEl("h1", { text: "What's your name?" });
-	
-				new Setting(contentEl)
-					.setName("Name")
-					.addText((text) =>
-					text.onChange((value) => {
-						this.noteName = value
-					}));
-		
-				new Setting(contentEl)
-					.setName("Description_temp")
-					.addText((text) =>
-					text.onChange((value) => {
-						this.noteDesc = value
-					}));
-	
-				new Setting(contentEl)
-				.addButton((btn) =>
-					btn
-					.setButtonText("Submit")
-					.setCta()
-					.onClick(() => {
-						this.close();
-						this.onSubmit(this.noteName, this.noteDesc);
-					}));
-
-			});
-
-		new ButtonComponent(buttonEl)
-		.setButtonText("Add song")
-		.setCta()
-		.onClick(() => {
-			this.close()
-		});
+				this.close();
+				this.onSubmit(this.noteName, this.noteDesc);
+			}));
 
 	}
   
