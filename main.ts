@@ -7,7 +7,6 @@ interface ArtistNames {
 }
   
 export default class MDBPlugin extends Plugin {
-
 	async onload() {
 		this.addRibbonIcon('file-volume', 'MusicDB Plugin', (evt: MouseEvent) => {
 			new MDBSelectAction(this.app).open()
@@ -52,8 +51,8 @@ class MDBSelectAction extends Modal {
 class MDBCreateNote extends Modal {
 	noteName: string;
 	noteDesc: string;
+
 	onSubmit: (noteName: string, noteDesc: string) => void;
-  
 	constructor(app: App, onSubmit: (noteName: string, noteDesc: string) => void) {
 	  super(app);
 	  this.onSubmit = onSubmit;
@@ -62,20 +61,45 @@ class MDBCreateNote extends Modal {
 	onOpen() {
 		const { contentEl } = this;
 
-		contentEl.createEl("h1", { text: "What's your name?" });
+		let noteTags: string;
+		let noteGroups: string;
+		let noteSongs: string;
+
+		contentEl.createEl("h1", { text: "Adding new artist..." });
 
 		new Setting(contentEl)
-			.setName("Name")
+			.setName("Artist name")
 			.addText((text) =>
 			text.onChange((value) => {
 				this.noteName = value
 			}));
 
 		new Setting(contentEl)
-			.setName("Description_temp")
+			.setName("Description")
 			.addText((text) =>
 			text.onChange((value) => {
 				this.noteDesc = value
+			}));
+
+		new Setting(contentEl)
+			.setName("Tags")
+			.addText((text) =>
+			text.onChange((tags) => {
+				noteTags = tags
+			}));
+
+		new Setting(contentEl)
+			.setName("Groups")
+			.addText((text) =>
+			text.onChange((groups) => {
+				noteGroups = groups
+			}));
+
+		new Setting(contentEl)
+			.setName("Songs")
+			.addText((text) =>
+			text.onChange((songs) => {
+				noteSongs = songs
 			}));
 
 		new Setting(contentEl)
@@ -84,8 +108,23 @@ class MDBCreateNote extends Modal {
 			.setButtonText("Submit")
 			.setCta()
 			.onClick(() => {
+
+				this.noteDesc = this.noteDesc
+
+				/*
+this.noteDesc = `${this.noteDesc}
+
+#${noteTags}
+
+**${noteGroups}**
+* ${noteSongs}`
+				*/
+
 				this.close();
-				this.onSubmit(this.noteName, this.noteDesc);
+				this.onSubmit(
+					this.noteName, 
+					this.noteDesc
+					);
 			}));
 
 	}
@@ -95,57 +134,6 @@ class MDBCreateNote extends Modal {
 		contentEl.empty();
 	}
 }
-
-/*
-class MDBAddSong extends Modal {
-	noteName: string;
-	noteDesc: string;
-	onSubmit: (noteName: string, noteDesc: string) => void;
-  
-	constructor(app: App, onSubmit: (noteName: string, noteDesc: string) => void) {
-	  super(app);
-	  this.onSubmit = onSubmit;
-	}
-  
-	onOpen() {
-		const { contentEl } = this;
-
-		// Remove this:
-		const fiels = this.app.vault.getMarkdownFiles()
-		contentEl.createEl("h1", { text: fiels[0].name });
-
-		new Setting(contentEl)
-			.setName("Name")
-			.addText((text) =>
-			text.onChange((value) => {
-				this.noteName = value
-			}));
-
-		new Setting(contentEl)
-			.setName("Description_temp")
-			.addText((text) =>
-			text.onChange((value) => {
-				this.noteDesc = value
-			}));
-
-		new Setting(contentEl)
-		.addButton((btn) =>
-			btn
-			.setButtonText("Submit")
-			.setCta()
-			.onClick(() => {
-				this.close();
-				this.onSubmit(this.noteName, this.noteDesc);
-			}));
-
-	}
-  
-	onClose() {
-		let { contentEl } = this;
-		contentEl.empty();
-	}
-}
-*/
 
 export class MDBAddSong extends FuzzySuggestModal<ArtistNames> {
 	getItems(): ArtistNames[] {
