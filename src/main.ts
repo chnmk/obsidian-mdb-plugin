@@ -2,7 +2,7 @@ import { Plugin } from 'obsidian';
 import { MDBSelectAction } from './modal/select';
 
 // https://docs.obsidian.md/
-// Use ctrl + shift + i to open developer tools in Obsidian.
+// Obsidian developer tools: ctrl + shift + i.
 
 // Main plugin class:
 export default class MDBPlugin extends Plugin {
