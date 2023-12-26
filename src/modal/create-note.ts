@@ -1,5 +1,73 @@
 import { App, ButtonComponent, Modal, Setting} from 'obsidian';
 
+/*
+	Function to create a button which when clicked adds a new input field number 'num'
+	on the 'div' div of the modal window.
+	The input will be added to the 'songs' section of the note.
+*/
+const buttonAddSong = (
+	div: HTMLElement, 
+	num: number, 
+	songs: string
+	) => {
+	
+	// TODO: fix new inputs being added only to the latest category
+	new Setting(div)
+	.setName("Song " + num)
+	.addText((text) =>
+	text.onChange((value) => {
+		songs = songs + value
+	}));
+
+}
+
+/* 
+	Function to create a category of songs number 'num'.
+	This adds a new section to the div 'div' of the 'window' modal window.
+	Window = "this" when this function is called inside onOpen().
+
+	TODO: make the following part true :)
+	Each song 'songs' will be added to its respective category 'cats' in the note.
+*/
+const buttonAddCat = (
+	window: Modal, 
+	div: HTMLElement, 
+	num: number, 
+	songs: string, 
+	cats: string 
+	) => {
+
+	let songNumber = 1;
+
+	new Setting(div)
+		.setName("Category " + num)
+		.addText((text) =>
+		text.onChange((value) => {
+			cats = value
+		}));
+
+	buttonAddSong(div, songNumber++, songs)
+
+	const buttonElNew = div.createDiv(
+		"add-cat-element-" + num
+	);	
+	buttonElNew.style.textAlign = 'right'
+	// TODO: border-top: none on some elements
+
+	new ButtonComponent(buttonElNew)
+		.setButtonText("New song")
+		.setCta()
+		.onClick(() => {
+			buttonAddSong(div, songNumber++, songs)
+		});
+
+}
+
+//
+
+/*
+	The note creation modal window.
+*/
 export class MDBCreateNote extends Modal {
 	noteName: string;
 	noteDesc: string;
@@ -11,81 +79,53 @@ export class MDBCreateNote extends Modal {
 	}
   
 	onOpen() {
+		
 		const { contentEl } = this;
-		const buttonEl = this.contentEl.createDiv(
-            "group-button-element"
-        );	
 
 		let noteTags: string;
-		let noteGroups: string;
+		let noteCats: string;
 		let noteSongs: string;
 
-		let groupNumber = 1;
+		let catNumber = 1;
 
 		contentEl.createEl("h1", { text: "Adding new artist..." });
 
-		new Setting(contentEl)
+		const artistInfo = contentEl.createDiv(
+			"artist-info"
+		);	
+
+		new Setting(artistInfo)
 			.setName("Artist name")
 			.addText((text) =>
 			text.onChange((value) => {
 				this.noteName = value
 			}));
 
-		new Setting(contentEl)
+		new Setting(artistInfo)
 			.setName("Description")
 			.addText((text) =>
 			text.onChange((value) => {
 				this.noteDesc = value
 			}));
 
-		new Setting(contentEl)
+		new Setting(artistInfo)
 			.setName("Tags")
 			.addText((text) =>
 			text.onChange((value) => {
 				noteTags = noteTags + value
 			}));
 
-		const buttonAddSong = (songNumber: number) => {
-			new Setting(contentEl)
-			.setName("Song " + songNumber)
-			.addText((text) =>
-			text.onChange((value) => {
-				noteSongs = noteSongs + value
-			}));
-		}
-
-		const buttonAddGroup = (groupNumber: number) => {
-
-			let songNumber = 1;
-
-			const buttonElNew = this.contentEl.createDiv(
-				"add-group-element-" + groupNumber
-			);	
-
-			new Setting(contentEl)
-			.setName("Group " + groupNumber)
-			.addText((text) =>
-			text.onChange((groups) => {
-				noteGroups = groups
-			}));
-
-			buttonAddSong(songNumber++)
-
-			new ButtonComponent(buttonElNew)
-			.setButtonText("New song")
-			.setCta()
-			.onClick(() => {
-				buttonAddSong(songNumber++)
-			});
-
-		}
+		const buttonEl = this.contentEl.createDiv(
+			"cat-button-element"
+		);
+		buttonEl.style.textAlign = 'right'
 
 		new ButtonComponent(buttonEl)
-		.setButtonText("New group")
-		.setCta()
-		.onClick(() => {
-			buttonAddGroup(groupNumber++)
-		});
+			.setButtonText("New group")
+			.setCta()
+			.onClick(() => {
+				buttonAddCat(this, artistInfo, catNumber++, noteCats, noteSongs)
+			});
 
 		new Setting(contentEl)
 		.addButton((btn) =>
@@ -94,16 +134,7 @@ export class MDBCreateNote extends Modal {
 			.setCta()
 			.onClick(() => {
 
-				//this.noteDesc = this.noteDesc
-
-				
-this.noteDesc = `${this.noteDesc}
-
-#${noteTags}
-
-**${noteGroups}**
-* ${noteSongs}`
-				
+				this.noteDesc = this.noteDesc
 
 				this.close();
 				this.onSubmit(
@@ -118,4 +149,15 @@ this.noteDesc = `${this.noteDesc}
 		let { contentEl } = this;
 		contentEl.empty();
 	}
+
 }
+
+/*
+this.noteDesc = `${this.noteDesc}
+
+#${noteTags}
+
+**${noteCats}**
+* ${noteSongs}`
+*/
+				
