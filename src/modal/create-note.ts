@@ -10,7 +10,6 @@ const buttonAddSong = (
 	num: number, 
 	songs: string
 	) => {
-	// TODO: fix new inputs being added only to the latest category
 	new Setting(div)
 		.setName("Song #" + num)
 		.addText((text) =>
@@ -32,10 +31,13 @@ const buttonAddCat = (
 	songs: string, 
 	cats: string 
 	) => {
-
+	
 	let songNumber = 1;
+	const currentDiv = div.createDiv(
+		"category-" + num
+	);	
 
-	new Setting(div)
+	new Setting(currentDiv)
 		.setHeading()
 		.setName("Category " + num)
 		.addButton((btn) => 
@@ -43,18 +45,18 @@ const buttonAddCat = (
 			.setButtonText("New song")
 			.setCta()
 			.onClick(() => {
-				buttonAddSong(div, songNumber++, songs)
+				buttonAddSong(currentDiv, songNumber++, songs)
 			})
 		);
 
-	new Setting(div)
+	new Setting(currentDiv)
 		.setName("Category name")
 		.addText((text) =>
 		text.onChange((value) => {
 			cats = value
 		}));
 
-	buttonAddSong(div, songNumber++, songs)
+	buttonAddSong(currentDiv, songNumber++, songs)
 }
 
 /*
@@ -80,23 +82,29 @@ export class MDBCreateNote extends Modal {
 
 		let catNumber = 1;
 
-		//contentEl.createEl("h1", { text: "Adding new artist..." });
 		new Setting(contentEl)
 			.setHeading()
 			.setName("Adding new artist...")
-			.addButton((btn) =>
-				btn
-				.setButtonText("Submit")
-				.setCta()
-				.onClick(() => {
-					this.noteDesc = this.noteDesc
 
-					this.close();
-					this.onSubmit(
-						this.noteName, 
-						this.noteDesc
-						);
-				}));
+		const submitButtonEl = this.contentEl.createDiv(
+			"submit-button-element"
+		);
+		submitButtonEl.style.marginBottom = '5%'
+
+
+		new ButtonComponent(submitButtonEl)
+			.setButtonText("Submit")
+			.setCta()
+			.onClick(() => {
+				this.noteDesc = this.noteDesc
+
+				this.close();
+				this.onSubmit(
+					this.noteName, 
+					this.noteDesc
+					);
+			})
+
 
 		const artistInfo = contentEl.createDiv(
 			"artist-info"
