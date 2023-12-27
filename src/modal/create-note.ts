@@ -1,7 +1,7 @@
 import { App, ButtonComponent, Modal, Setting} from 'obsidian';
 
 /*
-	Function to create a button which when clicked adds a new input field number 'num'
+	Function to create a new song number 'num' in the current category,
 	on the 'div' div of the modal window.
 	The input will be added to the 'songs' section of the note.
 */
@@ -10,15 +10,13 @@ const buttonAddSong = (
 	num: number, 
 	songs: string
 	) => {
-	
 	// TODO: fix new inputs being added only to the latest category
 	new Setting(div)
-	.setName("Song " + num)
-	.addText((text) =>
-	text.onChange((value) => {
-		songs = songs + value
-	}));
-
+		.setName("Song #" + num)
+		.addText((text) =>
+		text.onChange((value) => {
+			songs = songs + value
+		}));
 }
 
 /* 
@@ -26,11 +24,9 @@ const buttonAddSong = (
 	This adds a new section to the div 'div' of the 'window' modal window.
 	Window = "this" when this function is called inside onOpen().
 
-	TODO: make the following part true :)
 	Each song 'songs' will be added to its respective category 'cats' in the note.
 */
 const buttonAddCat = (
-	window: Modal, 
 	div: HTMLElement, 
 	num: number, 
 	songs: string, 
@@ -40,30 +36,26 @@ const buttonAddCat = (
 	let songNumber = 1;
 
 	new Setting(div)
+		.setHeading()
 		.setName("Category " + num)
+		.addButton((btn) => 
+			btn
+			.setButtonText("New song")
+			.setCta()
+			.onClick(() => {
+				buttonAddSong(div, songNumber++, songs)
+			})
+		);
+
+	new Setting(div)
+		.setName("Category name")
 		.addText((text) =>
 		text.onChange((value) => {
 			cats = value
 		}));
 
 	buttonAddSong(div, songNumber++, songs)
-
-	const buttonElNew = div.createDiv(
-		"add-cat-element-" + num
-	);	
-	buttonElNew.style.textAlign = 'right'
-	// TODO: border-top: none on some elements
-
-	new ButtonComponent(buttonElNew)
-		.setButtonText("New song")
-		.setCta()
-		.onClick(() => {
-			buttonAddSong(div, songNumber++, songs)
-		});
-
 }
-
-//
 
 /*
 	The note creation modal window.
@@ -88,11 +80,31 @@ export class MDBCreateNote extends Modal {
 
 		let catNumber = 1;
 
-		contentEl.createEl("h1", { text: "Adding new artist..." });
+		//contentEl.createEl("h1", { text: "Adding new artist..." });
+		new Setting(contentEl)
+			.setHeading()
+			.setName("Adding new artist...")
+			.addButton((btn) =>
+				btn
+				.setButtonText("Submit")
+				.setCta()
+				.onClick(() => {
+					this.noteDesc = this.noteDesc
+
+					this.close();
+					this.onSubmit(
+						this.noteName, 
+						this.noteDesc
+						);
+				}));
 
 		const artistInfo = contentEl.createDiv(
 			"artist-info"
 		);	
+
+		new Setting(artistInfo)
+			.setName("Info")
+			.setHeading()
 
 		new Setting(artistInfo)
 			.setName("Artist name")
@@ -124,32 +136,14 @@ export class MDBCreateNote extends Modal {
 			.setButtonText("New group")
 			.setCta()
 			.onClick(() => {
-				buttonAddCat(this, artistInfo, catNumber++, noteCats, noteSongs)
+				buttonAddCat(artistInfo, catNumber++, noteCats, noteSongs)
 			});
-
-		new Setting(contentEl)
-		.addButton((btn) =>
-			btn
-			.setButtonText("Submit")
-			.setCta()
-			.onClick(() => {
-
-				this.noteDesc = this.noteDesc
-
-				this.close();
-				this.onSubmit(
-					this.noteName, 
-					this.noteDesc
-					);
-			}));
-
 	}
   
 	onClose() {
 		let { contentEl } = this;
 		contentEl.empty();
 	}
-
 }
 
 /*
