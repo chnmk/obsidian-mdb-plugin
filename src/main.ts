@@ -1,5 +1,5 @@
 import { Plugin } from 'obsidian';
-import { MDBSelectAction } from './modal/select';
+import { MDBSelectAction } from './modal/modal-select';
 
 // https://docs.obsidian.md/
 // Obsidian developer tools: ctrl + shift + i.

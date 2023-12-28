@@ -1,63 +1,5 @@
-import { App, ButtonComponent, Modal, Setting} from 'obsidian';
-
-/*
-	Function to create a new song number 'num' in the current category,
-	on the 'div' div of the modal window.
-	The input will be added to the 'songs' section of the note.
-*/
-const buttonAddSong = (
-	div: HTMLElement, 
-	num: number, 
-	songs: string
-	) => {
-	new Setting(div)
-		.setName("Song #" + num)
-		.addText((text) =>
-		text.onChange((value) => {
-			songs = songs + value
-		}));
-}
-
-/* 
-	Function to create a category of songs number 'num'.
-	This adds a new section to the div 'div' of the 'window' modal window.
-	Window = "this" when this function is called inside onOpen().
-
-	Each song 'songs' will be added to its respective category 'cats' in the note.
-*/
-const buttonAddCat = (
-	div: HTMLElement, 
-	num: number, 
-	songs: string, 
-	cats: string 
-	) => {
-	
-	let songNumber = 1;
-	const currentDiv = div.createDiv(
-		"category-" + num
-	);	
-
-	new Setting(currentDiv)
-		.setHeading()
-		.setName("Category " + num)
-		.addButton((btn) => 
-			btn
-			.setButtonText("New song")
-			.setCta()
-			.onClick(() => {
-				buttonAddSong(currentDiv, songNumber++, songs)
-			})
-		);
-
-	new Setting(currentDiv)
-		.setName("Category name")
-		.addText((text) =>
-		text.onChange((value) => {
-			cats = value
-		}));
-
-	buttonAddSong(currentDiv, songNumber++, songs)
-}
+import { App, ButtonComponent, Modal, Setting } from 'obsidian';
+import { createCategoryDiv } from './components/create-category-div'; 
 
 /*
 	The note creation modal window.
@@ -68,8 +10,8 @@ export class MDBCreateNote extends Modal {
 
 	onSubmit: (noteName: string, noteDesc: string) => void;
 	constructor(app: App, onSubmit: (noteName: string, noteDesc: string) => void) {
-	  super(app);
-	  this.onSubmit = onSubmit;
+		super(app);
+		this.onSubmit = onSubmit;
 	}
   
 	onOpen() {
@@ -144,7 +86,7 @@ export class MDBCreateNote extends Modal {
 			.setButtonText("New group")
 			.setCta()
 			.onClick(() => {
-				buttonAddCat(artistInfo, catNumber++, noteCats, noteSongs)
+				createCategoryDiv(artistInfo, catNumber++, noteCats, noteSongs)
 			});
 	}
   

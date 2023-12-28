@@ -1,6 +1,6 @@
 import { ButtonComponent, Modal, Notice } from 'obsidian';
-import { MDBCreateNote } from './create-note';
-import { MDBAddSong } from './add-song';
+import { MDBCreateNote } from './modal-create-note';
+import { MDBAddSong } from './modal-add-song';
 
 // The main modal window that opens when the sidebar icon is clicked:
 export class MDBSelectAction extends Modal {
@@ -37,10 +37,10 @@ export class MDBSelectAction extends Modal {
 					// Display a pop-up notice when the note is created:
 					new Notice(`Note "${noteName}" created!`);
 
-				}).open()
-				
-			});
-		
+				}).open()		
+
+			});	
+			
 		// Create a new button in the select-buttons div:
 		new ButtonComponent(buttonsEl)
 			.setButtonText("Add song")
@@ -54,7 +54,5 @@ export class MDBSelectAction extends Modal {
 				new MDBAddSong(this.app).open()
 
 			});
-
 	}
-
 }
