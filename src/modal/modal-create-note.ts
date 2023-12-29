@@ -1,6 +1,11 @@
 import { App, ButtonComponent, Modal, Setting } from 'obsidian';
 import { createCategoryDiv } from './components/create-category-div'; 
 
+export type CatsAndSongs = {
+	Category: string;
+	Songs: string[];
+}[]
+
 // This window opens when the "Add song" button in modal-select is clicked:
 export class MDBCreateNote extends Modal {
 	// Name of the new note:
@@ -19,18 +24,14 @@ export class MDBCreateNote extends Modal {
 		// Set the main div of the modal window:
 		const { contentEl } = this;
 
-		type CatsAndSongs = [{
-			Category: string;
-			Songs: string[];
-		}]
-
-		let catsAndSongs: CatsAndSongs;
-		let catNumber = 1;
+		const defaulltObj = { Category: "", Songs: [""] };
+		
+		let catsAndSongs = [defaulltObj];
+		let catNumber = 0;
 		let noteTags: string[];
 
 		///===============
 		// Main header, submit-button div:
-
 		new Setting(contentEl)
 			.setHeading()
 			.setName("Adding new artist...")
@@ -83,7 +84,7 @@ export class MDBCreateNote extends Modal {
 			.setName("Tags")
 			.addText((text) =>
 			text.onChange((value) => {
-				noteTags.push(value)
+				noteTags[0] = value
 			}));
 
 		///===============
@@ -98,6 +99,7 @@ export class MDBCreateNote extends Modal {
 			.setButtonText("New category")
 			.setCta()
 			.onClick(() => {
+				catsAndSongs.push(defaulltObj)
 				createCategoryDiv(artistInfo, catNumber++, catsAndSongs)
 			});
 	}
