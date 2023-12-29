@@ -8,12 +8,12 @@ import { Setting } from 'obsidian';
 export const createSongInput = (
 	div: HTMLElement, 
 	num: number, 
-	songs: string
+	songs: string[]
 	) => {
 	new Setting(div)
 		.setName("Song #" + num)
 		.addText((text) =>
 		text.onChange((value) => {
-			songs = songs + value
+			songs.push(value)
 		}));
 }

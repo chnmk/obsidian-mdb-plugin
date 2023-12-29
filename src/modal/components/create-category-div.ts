@@ -1,6 +1,11 @@
 import { Setting } from 'obsidian';
 import { createSongInput } from '../components/create-song-input';
 
+type CatsAndSongs = [{
+	Category: string;
+	Songs: string[];
+}]
+
 /* 
 	Function to create a category of songs number 'num'.
 	This adds a new section to the div 'div' of the 'window' modal window.
@@ -11,8 +16,7 @@ import { createSongInput } from '../components/create-song-input';
 export const createCategoryDiv = (
 	div: HTMLElement, 
 	num: number, 
-	songs: string, 
-	cats: string 
+	catsAndSongs: CatsAndSongs
 	) => {
 	
 	let songNumber = 1;
@@ -28,7 +32,7 @@ export const createCategoryDiv = (
 			.setButtonText("New song")
 			.setCta()
 			.onClick(() => {
-				createSongInput(currentDiv, songNumber++, songs)
+				createSongInput(currentDiv, songNumber++, catsAndSongs[num].Songs)
 			})
 		);
 
@@ -36,8 +40,8 @@ export const createCategoryDiv = (
 		.setName("Category name")
 		.addText((text) =>
 		text.onChange((value) => {
-			cats = value
+			catsAndSongs[num].Category = value
 		}));
 
-	createSongInput(currentDiv, songNumber++, songs)
+	createSongInput(currentDiv, songNumber++, catsAndSongs[num].Songs)
 }

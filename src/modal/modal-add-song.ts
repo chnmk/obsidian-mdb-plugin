@@ -7,14 +7,16 @@ interface ArtistNames {
 
 export class MDBAddSong extends FuzzySuggestModal<ArtistNames> {
 	getItems(): ArtistNames[] {
-	  return this.app.vault.getMarkdownFiles();
+		// Get all files in the vault:
+		return this.app.vault.getMarkdownFiles();
 	}
   
 	getItemText(book: ArtistNames): string {
-	  return book.name;
+		// Get artist names:
+		return book.name;
 	}
   
 	onChooseItem(book: ArtistNames, evt: MouseEvent | KeyboardEvent) {
-	  new Notice(`Selected ${book.name}`);
+		new Notice(`Selected ${book.name}`);
 	}
 }

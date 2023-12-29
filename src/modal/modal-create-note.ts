@@ -1,13 +1,14 @@
 import { App, ButtonComponent, Modal, Setting } from 'obsidian';
 import { createCategoryDiv } from './components/create-category-div'; 
 
-/*
-	The note creation modal window.
-*/
+// This window opens when the "Add song" button in modal-select is clicked:
 export class MDBCreateNote extends Modal {
+	// Name of the new note:
 	noteName: string;
+	// Contents of the new note: 
 	noteDesc: string;
 
+	// Send the name and the contents to this.app.vault.create in modal-select:
 	onSubmit: (noteName: string, noteDesc: string) => void;
 	constructor(app: App, onSubmit: (noteName: string, noteDesc: string) => void) {
 		super(app);
@@ -15,14 +16,20 @@ export class MDBCreateNote extends Modal {
 	}
   
 	onOpen() {
-		
+		// Set the main div of the modal window:
 		const { contentEl } = this;
 
-		let noteTags: string;
-		let noteCats: string;
-		let noteSongs: string;
+		type CatsAndSongs = [{
+			Category: string;
+			Songs: string[];
+		}]
 
+		let catsAndSongs: CatsAndSongs;
 		let catNumber = 1;
+		let noteTags: string[];
+
+		///===============
+		// Main header, submit-button div:
 
 		new Setting(contentEl)
 			.setHeading()
@@ -33,12 +40,12 @@ export class MDBCreateNote extends Modal {
 		);
 		submitButtonEl.style.marginBottom = '5%'
 
-
 		new ButtonComponent(submitButtonEl)
 			.setButtonText("Submit")
 			.setCta()
 			.onClick(() => {
-				this.noteDesc = this.noteDesc
+				// Final contents of the file:
+				this.noteDesc = this.noteDesc + noteTags + catsAndSongs
 
 				this.close();
 				this.onSubmit(
@@ -46,7 +53,9 @@ export class MDBCreateNote extends Modal {
 					this.noteDesc
 					);
 			})
-
+		
+		///===============
+		// Artist-info div:
 
 		const artistInfo = contentEl.createDiv(
 			"artist-info"
@@ -74,8 +83,11 @@ export class MDBCreateNote extends Modal {
 			.setName("Tags")
 			.addText((text) =>
 			text.onChange((value) => {
-				noteTags = noteTags + value
+				noteTags.push(value)
 			}));
+
+		///===============
+		// Categories and songs:
 
 		const buttonEl = this.contentEl.createDiv(
 			"cat-button-element"
@@ -83,10 +95,10 @@ export class MDBCreateNote extends Modal {
 		buttonEl.style.textAlign = 'right'
 
 		new ButtonComponent(buttonEl)
-			.setButtonText("New group")
+			.setButtonText("New category")
 			.setCta()
 			.onClick(() => {
-				createCategoryDiv(artistInfo, catNumber++, noteCats, noteSongs)
+				createCategoryDiv(artistInfo, catNumber++, catsAndSongs)
 			});
 	}
   
@@ -95,13 +107,3 @@ export class MDBCreateNote extends Modal {
 		contentEl.empty();
 	}
 }
-
-/*
-this.noteDesc = `${this.noteDesc}
-
-#${noteTags}
-
-**${noteCats}**
-* ${noteSongs}`
-*/
-				
