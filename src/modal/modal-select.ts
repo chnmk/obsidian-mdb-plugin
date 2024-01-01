@@ -2,6 +2,16 @@ import { ButtonComponent, Modal, Notice } from 'obsidian';
 import { MDBCreateNote } from './modal-create-note';
 import { MDBAddSong } from './modal-add-song';
 
+export type databaseObj = {
+	Name: string;
+	Description: string;
+	Tags: string[];
+	Contents: {
+		Category: string;
+		Songs: string[];
+	}[]
+}[]
+
 // The main modal window that opens when the sidebar icon is clicked:
 export class MDBSelectAction extends Modal {
 	// Execute the following actions when the window opens:
@@ -20,6 +30,15 @@ export class MDBSelectAction extends Modal {
 		buttonsEl.style.alignItems = 'center'
 		buttonsEl.style.justifyContent = 'center'
 		buttonsEl.style.gap = '15px'
+
+		// Look for the json file:
+		const filesArray = this.app.vault.getFiles();
+
+		if (filesArray.some(e => e.name === 'database.json')) {
+			//let database = filesArray.filter(e => e.name === 'database.json')
+		} else {
+			this.app.vault.create('database.json', '')
+		}
 		
 		// Create a new button in the select-buttons div:
 		new ButtonComponent(buttonsEl)
@@ -33,7 +52,6 @@ export class MDBSelectAction extends Modal {
 				new MDBCreateNote(this.app, (noteName, noteDesc) => {
 					// Create a new note with the inputed title and content:
 					this.app.vault.create(`${noteName}.md`, noteDesc)
-
 					// Display a pop-up notice when the note is created:
 					new Notice(`Note "${noteName}" created!`);
 
