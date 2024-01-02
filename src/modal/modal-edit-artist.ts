@@ -26,10 +26,11 @@ export class MDBEditArtist extends Modal {
 	onOpen() {
 		// Set the main div of the modal window:
 		const { contentEl } = this;
+        const isEdit = this.artistName != "### New Artist ###"
         let modifiedObj: Database;
 
         // Create the main object:
-        if (this.artistName != "### New Artist ###") {
+        if (isEdit) {
             const currentObj = this.databaseObj.filter(x => x.Name === this.artistName)[0];
             modifiedObj = currentObj
         } else {
@@ -51,45 +52,51 @@ export class MDBEditArtist extends Modal {
 			.setButtonText("Submit")
 			.setCta()
 			.onClick(() => {
-                if (this.artistName === "### New Artist ###") {
-				    // Final contents of the file:
-                    this.noteName = modifiedObj.Name
+                // Final contents of the file:
+                this.noteName = modifiedObj.Name
 
-                    if (modifiedObj.Description != undefined && modifiedObj.Description != "") {
-                        this.noteDesc = modifiedObj.Description + "<br />"
-                    }
-                    if (modifiedObj.Tag != undefined && modifiedObj.Tag != "") {
-                        this.noteDesc = this.noteDesc + "<br />" + modifiedObj.Tag + "<br />"
-                    }
-                    if (modifiedObj.Contents != undefined) {
-                        modifiedObj.Contents.forEach((e) => {
-                            if (e.Category != "") {
-                                this.noteDesc = this.noteDesc + "<br />**" + e.Category + "**<br />"
-                            }
-                            e.Songs.forEach((s) => {
-                                if (s != "") {
-                                    this.noteDesc = this.noteDesc + "- " + s + "<br />"
-                                }
-                            })
-                        })
-                    }
-
-                    // Change the json file:
-                    const filesArray = this.app.vault.getFiles();
-                    let databaseFile = filesArray.filter(e => e.name === 'database.json')[0]
-
-                    const newDatabase = this.databaseObj.filter(x => x.Name !== this.artistName);
-                    newDatabase.push(modifiedObj)
-
-                    this.app.vault.modify(databaseFile, JSON.stringify(newDatabase))
-
-                    // Close the window:
-                    this.close();
-                    this.onSubmit(
-                        this.noteName, 
-                        this.noteDesc
-                        );
+                if (modifiedObj.Description != undefined && modifiedObj.Description != "") {
+                    this.noteDesc = modifiedObj.Description + "<br />"
                 }
+                if (modifiedObj.Tag != undefined && modifiedObj.Tag != "") {
+                    this.noteDesc = this.noteDesc + "<br />" + modifiedObj.Tag + "<br />"
+                }
+                if (modifiedObj.Contents != undefined) {
+                    modifiedObj.Contents.forEach((e) => {
+                        if (e.Category != "") {
+                            this.noteDesc = this.noteDesc + "<br />**" + e.Category + "**<br />"
+                        }
+                        e.Songs.forEach((s) => {
+                            if (s != "") {
+                                this.noteDesc = this.noteDesc + "- " + s + "<br />"
+                            }
+                        })
+                    })
+                }
+
+                // Remove old data when editing an existing note:
+
+                // Change the json file:
+                const filesArray = this.app.vault.getFiles();
+                let databaseFile = filesArray.filter(e => e.name === 'database.json')[0]
+
+                let newDatabase = this.databaseObj.filter(x => x.Name !== this.artistName);
+                newDatabase = this.databaseObj.filter(x => x.Name !== "### New Artist ###");
+                newDatabase.sort((a, b) => a.Name.localeCompare(b.Name));
+                newDatabase.push(modifiedObj)
+
+                this.app.vault.modify(databaseFile, JSON.stringify(newDatabase))
+
+                // Remove old .md file if needed: 
+                let mdFile = filesArray.filter(e => e.name === this.artistName + '.md')[0]
+                this.app.vault.delete(mdFile)
+
+                // Close the window:
+                this.close();
+                this.onSubmit(
+                    this.noteName, 
+                    this.noteDesc
+                    );
 			})
 		///===============
 		// Artist-info div:
@@ -105,7 +112,9 @@ export class MDBEditArtist extends Modal {
 		new Setting(artistInfo)
 			.setName("Artist name")
 			.addText((text) => {
-                text.setPlaceholder(this.artistName)
+                if (isEdit) {
+                    text.setValue(modifiedObj.Name)
+                }
                 text.onChange((value) => {
                     modifiedObj.Name = value
                 })
@@ -113,10 +122,14 @@ export class MDBEditArtist extends Modal {
 
 		new Setting(artistInfo)
 			.setName("Description")
-			.addText((text) =>
-			text.onChange((value) => {
-                modifiedObj.Description = value
-			}));
+			.addText((text) => {
+                if (isEdit && modifiedObj.Description != undefined) {
+                    text.setValue(modifiedObj.Description)
+                }
+                text.onChange((value) => {
+                    modifiedObj.Description = value
+                })
+			});
 
 		new Setting(artistInfo)
 			.setName("Tag")
@@ -143,12 +156,12 @@ export class MDBEditArtist extends Modal {
 			.setButtonText("New category")
 			.setCta()
 			.onClick(() => {
-                if (modifiedObj.Contents != undefined) {
+                if (modifiedObj.Contents != undefined && modifiedObj.Contents.length > catNumber) {
                     modifiedObj.Contents.push({ Category: "", Songs: [""]})
                 } else {
                     modifiedObj.Contents = [{ Category: "", Songs: [""]}]
                 }
-				createCategoryDiv(artistInfo, modifiedObj, catNumber++)
+				createCategoryDiv(isEdit, artistInfo, modifiedObj, catNumber++)
 			});
 	}
   

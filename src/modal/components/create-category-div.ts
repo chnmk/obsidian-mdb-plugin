@@ -10,6 +10,7 @@ import { Database } from 'src/main';
 	Each song 'songs' will be added to its respective category 'cats' in the note.
 */
 export const createCategoryDiv = (
+	isEdit: boolean,
 	div: HTMLElement, 
 	obj: Database,
 	catNumber: number,
@@ -30,18 +31,22 @@ export const createCategoryDiv = (
 			.setButtonText("New song")
 			.setCta()
 			.onClick(() => {
-				createSongInput(currentDiv, obj, catNumber, songNumber++)
+				createSongInput(isEdit, currentDiv, obj, catNumber, songNumber++)
 			})
 		);
 
 	new Setting(currentDiv)
 		.setName("Category name")
-		.addText((text) =>
-		text.onChange((value) => {
-			if (obj.Contents != undefined) {
-				obj.Contents[catNumber].Category = value
+		.addText((text) => {
+			if (isEdit && obj.Contents != undefined) {
+				text.setValue(obj.Contents[catNumber].Category)
 			}
-		}));
+			text.onChange((value) => {
+				if (obj.Contents != undefined) {
+					obj.Contents[catNumber].Category = value
+				}
+				})
+		});
 
-	createSongInput(currentDiv, obj, catNumber, songNumber++)
+	createSongInput(isEdit, currentDiv, obj, catNumber, songNumber++)
 }
