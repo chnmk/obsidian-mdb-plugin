@@ -1,6 +1,6 @@
 import { Setting } from 'obsidian';
 import { createSongInput } from '../components/create-song-input';
-import { CatsAndSongs } from '../modal-create-note';
+//import { CatsAndSongs } from '../modal-edit-note';
 
 /* 
 	Function to create a category of songs number 'num'.
@@ -12,7 +12,7 @@ import { CatsAndSongs } from '../modal-create-note';
 export const createCategoryDiv = (
 	div: HTMLElement, 
 	catNumber: number, 
-	catsAndSongs: CatsAndSongs
+	//catsAndSongs: CatsAndSongs
 	) => {
 	
 	let songNumber = 0;
@@ -29,7 +29,7 @@ export const createCategoryDiv = (
 			.setButtonText("New song")
 			.setCta()
 			.onClick(() => {
-				createSongInput(currentDiv, catNumber, songNumber++, catsAndSongs)
+				//createSongInput(currentDiv, catNumber, songNumber++, catsAndSongs)
 			})
 		);
 
@@ -37,8 +37,8 @@ export const createCategoryDiv = (
 		.setName("Category name")
 		.addText((text) =>
 		text.onChange((value) => {
-			catsAndSongs[catNumber].Category = value
+			//catsAndSongs[catNumber].Category = value
 		}));
 
-	createSongInput(currentDiv, catNumber, songNumber++, catsAndSongs)
+	//createSongInput(currentDiv, catNumber, songNumber++, catsAndSongs)
 }

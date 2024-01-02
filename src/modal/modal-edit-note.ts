@@ -1,29 +1,31 @@
-import { App, ButtonComponent, Modal, Setting } from 'obsidian';
+import { App, ButtonComponent, Modal, PopoverSuggest, Setting, fuzzySearch } from 'obsidian';
 import { createCategoryDiv } from './components/create-category-div'; 
 
-export type databaseObj = {
+export type Database = {
 	Name: string;
-	Description: string;
-	Tags: string[];
+	Description: string | undefined;
+	Tags: string[] | undefined;
 	Contents: {
 		Category: string;
 		Songs: string[];
-	}[]
+	}[] | undefined
 }[]
 
+/*
 export type CatsAndSongs = {
 	Category: string;
 	Songs: string[];
 }[]
+*/
 
 // This window opens when the "Add song" button in modal-select is clicked:
-export class MDBCreateNote extends Modal {
+export class MDBEditNote extends Modal {
 	// Name of the new note:
 	noteName: string;
 	// Contents of the new note: 
 	noteDesc: string;
-
-	// Send the name and the contents to this.app.vault.create in modal-select:
+	
+	// Send the name and the contents to this.app.vault.create in main.ts:
 	onSubmit: (noteName: string, noteDesc: string) => void;
 	constructor(app: App, onSubmit: (noteName: string, noteDesc: string) => void) {
 		super(app);
@@ -31,23 +33,30 @@ export class MDBCreateNote extends Modal {
 	}
   
 	onOpen() {
-		// Look for the json file:
-		const filesArray = this.app.vault.getFiles();
-		
-		if (filesArray.some(e => e.name === 'database.json')) {
-			//let database = filesArray.filter(e => e.name === 'database.json')
-		} else {
-			this.app.vault.create('database.json', '')
-		}
-
 		// Set the main div of the modal window:
 		const { contentEl } = this;
 
-		const defaulltObj = { Category: "", Songs: [""] };
+		const emptyArtist = {
+			Name: ""
+		}
 		
+		/*
+		const defaulltObj = { Category: "", Songs: [""] };
+
 		let catsAndSongs = [defaulltObj];
 		let catNumber = 0;
 		let noteTags: string[];
+		*/
+
+		// Look for the json file:
+		const filesArray = this.app.vault.getFiles();
+
+		if (filesArray.some(e => e.name === 'database.json')) {
+			let database = filesArray.filter(e => e.name === 'database.json')
+		} else {
+			let database: Database;
+			this.app.vault.create('database.json', '')
+		}
 
 		///===============
 		// Main header, submit-button div:
@@ -64,6 +73,7 @@ export class MDBCreateNote extends Modal {
 			.setButtonText("Submit")
 			.setCta()
 			.onClick(() => {
+				/*
 				// Final contents of the file:
 				this.noteDesc = this.noteDesc + noteTags + catsAndSongs
 
@@ -72,8 +82,8 @@ export class MDBCreateNote extends Modal {
 					this.noteName, 
 					this.noteDesc
 					);
+				*/
 			})
-		
 		///===============
 		// Artist-info div:
 
@@ -89,21 +99,45 @@ export class MDBCreateNote extends Modal {
 			.setName("Artist name")
 			.addText((text) =>
 			text.onChange((value) => {
+				/*
 				this.noteName = value
+				*/
+			}));
+
+
+		let q = {
+			fuzzy: ["myFuzzy"],
+			query: "myQuery",
+			tokens: ["myTokens"]
+		}
+		fuzzySearch(q, "texthello")
+
+
+		new Setting(artistInfo)
+			.setName("Artist name 2")
+			.addSearch((text) =>
+			text.onChange((value) => {
+				/*
+				this.noteName = value
+				*/
 			}));
 
 		new Setting(artistInfo)
 			.setName("Description")
 			.addText((text) =>
 			text.onChange((value) => {
+				/*
 				this.noteDesc = value
+				*/
 			}));
 
 		new Setting(artistInfo)
 			.setName("Tags")
 			.addText((text) =>
 			text.onChange((value) => {
+				/*
 				noteTags[0] = value
+				*/
 			}));
 
 		///===============
@@ -118,8 +152,10 @@ export class MDBCreateNote extends Modal {
 			.setButtonText("New category")
 			.setCta()
 			.onClick(() => {
+				/*
 				catsAndSongs.push(defaulltObj)
 				createCategoryDiv(artistInfo, catNumber++, catsAndSongs)
+				*/
 			});
 	}
   
