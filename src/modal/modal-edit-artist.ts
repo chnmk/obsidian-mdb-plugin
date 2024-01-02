@@ -55,15 +55,22 @@ export class MDBEditArtist extends Modal {
 				    // Final contents of the file:
                     this.noteName = modifiedObj.Name
 
-                    if (modifiedObj.Description != undefined) {
-                        this.noteDesc = modifiedObj.Description
+                    if (modifiedObj.Description != undefined && modifiedObj.Description != "") {
+                        this.noteDesc = modifiedObj.Description + "<br />"
                     }
-                    if (modifiedObj.Tag != undefined) {
-                        this.noteDesc = this.noteDesc + modifiedObj.Tag
+                    if (modifiedObj.Tag != undefined && modifiedObj.Tag != "") {
+                        this.noteDesc = this.noteDesc + "<br />" + modifiedObj.Tag + "<br />"
                     }
                     if (modifiedObj.Contents != undefined) {
                         modifiedObj.Contents.forEach((e) => {
-                            this.noteDesc = this.noteDesc + e.Songs
+                            if (e.Category != "") {
+                                this.noteDesc = this.noteDesc + "<br />**" + e.Category + "**<br />"
+                            }
+                            e.Songs.forEach((s) => {
+                                if (s != "") {
+                                    this.noteDesc = this.noteDesc + "- " + s + "<br />"
+                                }
+                            })
                         })
                     }
 
