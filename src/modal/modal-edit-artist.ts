@@ -54,6 +54,7 @@ export class MDBEditArtist extends Modal {
 			.onClick(() => {
                 // Final contents of the file:
                 this.noteName = modifiedObj.Name
+                this.noteDesc = ""
 
                 if (modifiedObj.Description != undefined && modifiedObj.Description != "") {
                     this.noteDesc = modifiedObj.Description + "<br />"
@@ -74,21 +75,28 @@ export class MDBEditArtist extends Modal {
                     })
                 }
 
-                // Remove old data when editing an existing note:
 
                 // Change the json file:
                 const filesArray = this.app.vault.getFiles();
-                let databaseFile = filesArray.filter(e => e.name === 'database.json')[0]
 
-                let newDatabase = this.databaseObj.filter(x => x.Name !== this.artistName);
-                newDatabase = this.databaseObj.filter(x => x.Name !== "### New Artist ###");
-                newDatabase.sort((a, b) => a.Name.localeCompare(b.Name));
+                let newDatabase = this.databaseObj.filter(x => x.Name != this.artistName);
+                newDatabase = newDatabase .filter(x => x.Name != modifiedObj.Name);
+                newDatabase = newDatabase.filter(x => x.Name != "### New Artist ###");
+
+                // Remove empty categories, then push and sort
+                if (modifiedObj.Contents != undefined) {
+                    modifiedObj.Contents.forEach(cat => cat.Songs.filter(s => s != ""))
+                    modifiedObj.Contents.filter(cs => cs.Songs.length != 0 && cs.Category != "")
+                }
                 newDatabase.push(modifiedObj)
-
+                newDatabase.sort((a, b) => a.Name.localeCompare(b.Name));
+                
+                // Remove old data when editing an existing note:
+                const databaseFile = filesArray.filter(e => e.name === 'database.json')[0]
                 this.app.vault.modify(databaseFile, JSON.stringify(newDatabase))
 
                 // Remove old .md file if needed: 
-                let mdFile = filesArray.filter(e => e.name === this.artistName + '.md')[0]
+                const mdFile = filesArray.filter(e => e.name === this.artistName + '.md')[0]
                 this.app.vault.delete(mdFile)
 
                 // Close the window:
