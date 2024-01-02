@@ -8,7 +8,7 @@ import { MDBSelectArtist } from './modal/modal-select-artist';
 export type Database = {
 	Name: string;
 	Description?: string;
-	Tags?: string[];
+	Tag?: string;
 	Contents?: {
 		Category: string;
 		Songs: string[];

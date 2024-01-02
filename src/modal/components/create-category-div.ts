@@ -1,6 +1,6 @@
 import { Setting } from 'obsidian';
 import { createSongInput } from '../components/create-song-input';
-//import { CatsAndSongs } from '../modal-edit-note';
+import { Database } from 'src/main';
 
 /* 
 	Function to create a category of songs number 'num'.
@@ -11,16 +11,17 @@ import { createSongInput } from '../components/create-song-input';
 */
 export const createCategoryDiv = (
 	div: HTMLElement, 
-	catNumber: number, 
-	//catsAndSongs: CatsAndSongs
+	obj: Database,
+	catNumber: number,
 	) => {
 	
-	let songNumber = 0;
 	const currentDiv = div.createDiv(
 		"category-" + catNumber
-	);	
+	);
 
 	const displayedNum = catNumber+1
+	let songNumber = 0
+
 	new Setting(currentDiv)
 		.setHeading()
 		.setName("Category " + displayedNum)
@@ -29,7 +30,7 @@ export const createCategoryDiv = (
 			.setButtonText("New song")
 			.setCta()
 			.onClick(() => {
-				//createSongInput(currentDiv, catNumber, songNumber++, catsAndSongs)
+				createSongInput(currentDiv, obj, catNumber, songNumber++)
 			})
 		);
 
@@ -37,8 +38,10 @@ export const createCategoryDiv = (
 		.setName("Category name")
 		.addText((text) =>
 		text.onChange((value) => {
-			//catsAndSongs[catNumber].Category = value
+			if (obj.Contents != undefined) {
+				obj.Contents[catNumber].Category = value
+			}
 		}));
 
-	//createSongInput(currentDiv, catNumber, songNumber++, catsAndSongs)
+	createSongInput(currentDiv, obj, catNumber, songNumber++)
 }

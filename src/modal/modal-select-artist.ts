@@ -23,20 +23,20 @@ export class MDBSelectArtist extends FuzzySuggestModal<Database> {
 		if (artist.Name != "### New Artist ###") {
 			new Notice(`Selected ${artist.Name}`);
 		} else {
-			new Notice(`Creating new artist...`);
+			new Notice(`Adding new artist...`);
 		}
 
 		// Open the next modal window:
-		new MDBEditArtist(this.app, this.databaseObj, (noteName, noteDesc) => {
-			// Create a new note with the inputed title and content:
-			this.app.vault.create(`${noteName}.md`, noteDesc)
-			// Display a pop-up notice when the note is created:
-			new Notice(`Note "${noteName}" created!`);
-		}).open()
+		new MDBEditArtist(
+			this.app, 
+			this.databaseObj, 
+			artist.Name, 
+			(noteName, noteDesc) => {
+				// Create a new note with the inputed title and content:
+				this.app.vault.create(`${noteName}.md`, noteDesc)
+				// Display a pop-up notice when the note is created:
+				new Notice(`Note "${noteName}" created!`);
+			}
+		).open()
 	}
 }
-
-/*
-// Open the note creation window:
-
-*/

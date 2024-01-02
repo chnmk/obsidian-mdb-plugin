@@ -1,46 +1,40 @@
-import { App, ButtonComponent, Modal, PopoverSuggest, Setting, fuzzySearch } from 'obsidian';
+import { App, ButtonComponent, Modal, Setting } from 'obsidian';
 import { createCategoryDiv } from './components/create-category-div'; 
 import { Database } from 'src/main';
 
-/*
-export type CatsAndSongs = {
-	Category: string;
-	Songs: string[];
-}[]
-*/
-
 // This window opens when the "Add song" button in modal-select is clicked:
 export class MDBEditArtist extends Modal {
-	// Name of the new note:
+    // Arguments recieved from the select window:
 	noteName: string;
-	// Contents of the new note: 
 	noteDesc: string;
-
+    artistName: string;
     databaseObj: Database[];
-	
-	// Send the name and the contents to this.app.vault.create in main.ts:
 	onSubmit: (noteName: string, noteDesc: string) => void;
-	constructor(app: App, databaseObj: Database[], onSubmit: (noteName: string, noteDesc: string) => void) {
-		super(app);
-		this.onSubmit = onSubmit;
-        this.databaseObj = databaseObj
-	}
+
+	constructor(
+        app: App, 
+        databaseObj: Database[], 
+        artistName: string,
+        onSubmit: (noteName: string, noteDesc: string) => void
+        ) {
+            super(app);
+            this.onSubmit = onSubmit;
+            this.databaseObj = databaseObj
+            this.artistName = artistName
+	    }
   
 	onOpen() {
 		// Set the main div of the modal window:
 		const { contentEl } = this;
+        let modifiedObj: Database;
 
-		const emptyArtist = {
-			Name: ""
-		}
-		
-		/*
-		const defaulltObj = { Category: "", Songs: [""] };
-
-		let catsAndSongs = [defaulltObj];
-		let catNumber = 0;
-		let noteTags: string[];
-		*/
+        // Create the main object:
+        if (this.artistName != "### New Artist ###") {
+            const currentObj = this.databaseObj.filter(x => x.Name === this.artistName)[0];
+            modifiedObj = currentObj
+        } else {
+            modifiedObj = { Name: "" }
+        }
 
 		///===============
 		// Main header, submit-button div:
@@ -57,16 +51,38 @@ export class MDBEditArtist extends Modal {
 			.setButtonText("Submit")
 			.setCta()
 			.onClick(() => {
-				/*
-				// Final contents of the file:
-				this.noteDesc = this.noteDesc + noteTags + catsAndSongs
+                if (this.artistName === "### New Artist ###") {
+				    // Final contents of the file:
+                    this.noteName = modifiedObj.Name
 
-				this.close();
-				this.onSubmit(
-					this.noteName, 
-					this.noteDesc
-					);
-				*/
+                    if (modifiedObj.Description != undefined) {
+                        this.noteDesc = modifiedObj.Description
+                    }
+                    if (modifiedObj.Tag != undefined) {
+                        this.noteDesc = this.noteDesc + modifiedObj.Tag
+                    }
+                    if (modifiedObj.Contents != undefined) {
+                        modifiedObj.Contents.forEach((e) => {
+                            this.noteDesc = this.noteDesc + e.Songs
+                        })
+                    }
+
+                    // Change the json file:
+                    const filesArray = this.app.vault.getFiles();
+                    let databaseFile = filesArray.filter(e => e.name === 'database.json')[0]
+
+                    const newDatabase = this.databaseObj.filter(x => x.Name !== this.artistName);
+                    newDatabase.push(modifiedObj)
+
+                    this.app.vault.modify(databaseFile, JSON.stringify(newDatabase))
+
+                    // Close the window:
+                    this.close();
+                    this.onSubmit(
+                        this.noteName, 
+                        this.noteDesc
+                        );
+                }
 			})
 		///===============
 		// Artist-info div:
@@ -81,48 +97,30 @@ export class MDBEditArtist extends Modal {
 
 		new Setting(artistInfo)
 			.setName("Artist name")
-			.addText((text) =>
-			text.onChange((value) => {
-				/*
-				this.noteName = value
-				*/
-			}));
-
-
-		let q = {
-			fuzzy: ["myFuzzy"],
-			query: "myQuery",
-			tokens: ["myTokens"]
-		}
-		fuzzySearch(q, "texthello")
-
-
-		new Setting(artistInfo)
-			.setName("Artist name 2")
-			.addSearch((text) =>
-			text.onChange((value) => {
-				/*
-				this.noteName = value
-				*/
-			}));
+			.addText((text) => {
+                text.setPlaceholder(this.artistName)
+                text.onChange((value) => {
+                    modifiedObj.Name = value
+                })
+            });
 
 		new Setting(artistInfo)
 			.setName("Description")
 			.addText((text) =>
 			text.onChange((value) => {
-				/*
-				this.noteDesc = value
-				*/
+                modifiedObj.Description = value
 			}));
 
 		new Setting(artistInfo)
-			.setName("Tags")
-			.addText((text) =>
-			text.onChange((value) => {
-				/*
-				noteTags[0] = value
-				*/
-			}));
+			.setName("Tag")
+            .addDropdown((drop) => {
+                drop.addOption("Placeholder", "Placeholder")
+            })
+			.addExtraButton((btn) => {
+                btn.onClick(() => {
+                    // Add tag editor window
+                })
+			});
 
 		///===============
 		// Categories and songs:
@@ -132,14 +130,18 @@ export class MDBEditArtist extends Modal {
 		);
 		buttonEl.style.textAlign = 'right'
 
+        let catNumber = 0;
+
 		new ButtonComponent(buttonEl)
 			.setButtonText("New category")
 			.setCta()
 			.onClick(() => {
-				/*
-				catsAndSongs.push(defaulltObj)
-				createCategoryDiv(artistInfo, catNumber++, catsAndSongs)
-				*/
+                if (modifiedObj.Contents != undefined) {
+                    modifiedObj.Contents.push({ Category: "", Songs: [""]})
+                } else {
+                    modifiedObj.Contents = [{ Category: "", Songs: [""]}]
+                }
+				createCategoryDiv(artistInfo, modifiedObj, catNumber++)
 			});
 	}
   

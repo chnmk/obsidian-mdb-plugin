@@ -1,5 +1,5 @@
 import { Setting } from 'obsidian';
-//import { CatsAndSongs } from '../modal-edit-note';
+import { Database } from 'src/main';
 
 /*
 	Function to create a new song number 'num' in the current category,
@@ -8,18 +8,19 @@ import { Setting } from 'obsidian';
 */
 export const createSongInput = (
 	div: HTMLElement, 
+	obj: Database,
 	catNumber: number,
 	songNumber: number,
-	//catsAndSongs: CatsAndSongs
 	) => {
 	
-	//catsAndSongs[catNumber].Songs.push("")
 	const displayedNum = songNumber+1
 	
 	new Setting(div)
 		.setName("Song #" + displayedNum)
 		.addText((text) =>
 		text.onChange((value) => {
-			//catsAndSongs[catNumber].Songs[songNumber] = value
+			if (obj.Contents != undefined) {
+				obj.Contents[catNumber].Songs[songNumber] = value
+			}
 		}));
 }
