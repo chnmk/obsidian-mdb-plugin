@@ -1,15 +1,6 @@
 import { App, ButtonComponent, Modal, PopoverSuggest, Setting, fuzzySearch } from 'obsidian';
 import { createCategoryDiv } from './components/create-category-div'; 
-
-export type Database = {
-	Name: string;
-	Description: string | undefined;
-	Tags: string[] | undefined;
-	Contents: {
-		Category: string;
-		Songs: string[];
-	}[] | undefined
-}[]
+import { Database } from 'src/main';
 
 /*
 export type CatsAndSongs = {
@@ -19,17 +10,20 @@ export type CatsAndSongs = {
 */
 
 // This window opens when the "Add song" button in modal-select is clicked:
-export class MDBEditNote extends Modal {
+export class MDBEditArtist extends Modal {
 	// Name of the new note:
 	noteName: string;
 	// Contents of the new note: 
 	noteDesc: string;
+
+    databaseObj: Database[];
 	
 	// Send the name and the contents to this.app.vault.create in main.ts:
 	onSubmit: (noteName: string, noteDesc: string) => void;
-	constructor(app: App, onSubmit: (noteName: string, noteDesc: string) => void) {
+	constructor(app: App, databaseObj: Database[], onSubmit: (noteName: string, noteDesc: string) => void) {
 		super(app);
 		this.onSubmit = onSubmit;
+        this.databaseObj = databaseObj
 	}
   
 	onOpen() {
@@ -47,16 +41,6 @@ export class MDBEditNote extends Modal {
 		let catNumber = 0;
 		let noteTags: string[];
 		*/
-
-		// Look for the json file:
-		const filesArray = this.app.vault.getFiles();
-
-		if (filesArray.some(e => e.name === 'database.json')) {
-			let database = filesArray.filter(e => e.name === 'database.json')
-		} else {
-			let database: Database;
-			this.app.vault.create('database.json', '')
-		}
 
 		///===============
 		// Main header, submit-button div:

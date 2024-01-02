@@ -1,32 +1,42 @@
-import { Notice, FuzzySuggestModal } from 'obsidian';
+import { App, Notice, FuzzySuggestModal } from 'obsidian';
+import { Database } from 'src/main';
+import { MDBEditArtist } from './modal-edit-artist'; 
 
-// Interface to get "name" property from files after getMarkdownFiles():
-interface ArtistNames {
-	name: string;
-}
+export class MDBSelectArtist extends FuzzySuggestModal<Database> {
+	databaseObj: Database[];
+	constructor(app: App, databaseObj: Database[]) {
+		super(app);
+		this.databaseObj = databaseObj
+	}
 
-export class MDBSelectArtist extends FuzzySuggestModal<ArtistNames> {
-	getItems(): ArtistNames[] {
+	getItems(): Database[] {
 		// Get all files in the vault:
-		return this.app.vault.getMarkdownFiles();
+		return this.databaseObj
 	}
   
-	getItemText(book: ArtistNames): string {
+	getItemText(artist: Database): string {
 		// Get artist names:
-		return book.name;
+		return artist.Name;
 	}
   
-	onChooseItem(book: ArtistNames, evt: MouseEvent | KeyboardEvent) {
-		new Notice(`Selected ${book.name}`);
+	onChooseItem(artist: Database, evt: MouseEvent | KeyboardEvent) {
+		if (artist.Name != "### New Artist ###") {
+			new Notice(`Selected ${artist.Name}`);
+		} else {
+			new Notice(`Creating new artist...`);
+		}
+
+		// Open the next modal window:
+		new MDBEditArtist(this.app, this.databaseObj, (noteName, noteDesc) => {
+			// Create a new note with the inputed title and content:
+			this.app.vault.create(`${noteName}.md`, noteDesc)
+			// Display a pop-up notice when the note is created:
+			new Notice(`Note "${noteName}" created!`);
+		}).open()
 	}
 }
 
 /*
 // Open the note creation window:
-new MDBCreateNote(this.app, (noteName, noteDesc) => {
-	// Create a new note with the inputed title and content:
-	this.app.vault.create(`${noteName}.md`, noteDesc)
-	// Display a pop-up notice when the note is created:
-	new Notice(`Note "${noteName}" created!`);
-}).open()
+
 */
