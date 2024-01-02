@@ -1,6 +1,16 @@
 import { App, ButtonComponent, Modal, Setting } from 'obsidian';
 import { createCategoryDiv } from './components/create-category-div'; 
 
+export type databaseObj = {
+	Name: string;
+	Description: string;
+	Tags: string[];
+	Contents: {
+		Category: string;
+		Songs: string[];
+	}[]
+}[]
+
 export type CatsAndSongs = {
 	Category: string;
 	Songs: string[];
@@ -21,6 +31,15 @@ export class MDBCreateNote extends Modal {
 	}
   
 	onOpen() {
+		// Look for the json file:
+		const filesArray = this.app.vault.getFiles();
+		
+		if (filesArray.some(e => e.name === 'database.json')) {
+			//let database = filesArray.filter(e => e.name === 'database.json')
+		} else {
+			this.app.vault.create('database.json', '')
+		}
+
 		// Set the main div of the modal window:
 		const { contentEl } = this;
 
