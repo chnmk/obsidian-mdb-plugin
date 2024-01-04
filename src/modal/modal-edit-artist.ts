@@ -1,6 +1,7 @@
 import { App, ButtonComponent, Modal, Setting } from 'obsidian';
 import { createCategoryDiv } from './components/create-category-div'; 
 import { Database } from 'src/main';
+import { MDBEditTags } from './modal-edit-tags';
 
 // This window opens when the "Add song" button in modal-select is clicked:
 export class MDBEditArtist extends Modal {
@@ -146,7 +147,9 @@ export class MDBEditArtist extends Modal {
             })
 			.addExtraButton((btn) => {
                 btn.onClick(() => {
-                    // Add tag editor window
+                    new MDBEditTags(
+                        this.app
+                    ).open()
                 })
 			});
 
