@@ -87,7 +87,7 @@ export class MDBEditArtist extends Modal {
                 // Remove empty categories, then push and sort
                 if (modifiedObj.Contents != undefined) {
                     modifiedObj.Contents.forEach(cat => cat.Songs.filter(s => s != ""))
-                    modifiedObj.Contents.filter(cs => cs.Songs.length != 0 && cs.Category != "")
+                    modifiedObj.Contents = modifiedObj.Contents.filter(cat => (cat.Songs.length != 1 || cat.Songs[0] != "") || cat.Category != "")
                 }
                 newDatabase.push(modifiedObj)
                 newDatabase.sort((a, b) => a.Name.localeCompare(b.Name));
