@@ -1,7 +1,7 @@
-import { App, ButtonComponent, Modal, Setting, TFile, Notice } from 'obsidian';
+import { App, ButtonComponent, Modal, Setting } from 'obsidian';
 import { createCategoryDiv } from './components/create-category-div'; 
+import { createTagDiv } from './components/create-tag-div';
 import { Database } from 'src/main';
-import { MDBEditTags } from './modal-edit-tags';
 
 // This window opens when the "Add song" button in modal-select is clicked:
 export class MDBEditArtist extends Modal {
@@ -60,9 +60,13 @@ export class MDBEditArtist extends Modal {
                 if (modifiedObj.Description != undefined && modifiedObj.Description != "") {
                     this.noteDesc = modifiedObj.Description + "<br />"
                 }
-                //if (modifiedObj.Tags != undefined && modifiedObj.Tags != "") {
-                //    this.noteDesc = this.noteDesc + "<br />" + modifiedObj.Tags + "<br />"
-                //}
+                if (modifiedObj.Tags != undefined) {
+                    this.noteDesc = this.noteDesc + "<br />"
+                    modifiedObj.Tags.forEach((t) => {
+                        this.noteDesc = this.noteDesc + "#" + t + " "
+                    })
+                    this.noteDesc = this.noteDesc + "<br />"
+                }
                 if (modifiedObj.Contents != undefined) {
                     modifiedObj.Contents.forEach((e) => {
                         if (e.Category != "") {
@@ -138,39 +142,35 @@ export class MDBEditArtist extends Modal {
                 })
 			});
 
-		new Setting(artistInfo)
-			.setName("Tag")
-            .addDropdown((drop) => {
-                drop.addOption("Placeholder", "Placeholder")
-            })
-			.addExtraButton((btn) => {
-                btn.onClick(() => {
-                    let tags = ["### No tags yet! ###"]
 
-                    async function loadTags(app: App, tags: string[]) {
-                        const filesArray = app.vault.getFiles();
+		///===============
+		// Tags:
 
-                        if (filesArray.some((e: TFile) => e.name === 'tags.json')) {
-                            let tagsFile = filesArray.filter((e: TFile) => e.name === 'tags.json')[0]
-                            let tagsFileContent = await app.vault.read(tagsFile)            
-                            try { 
-                                tags = JSON.parse(tagsFileContent)
-                            } catch {
-                                new Notice(`tags.json file is corrupted!`);
-                            }
-                        } else {
-                            app.vault.create('tags.json', '')
-                        }
+        const tagsEl = artistInfo.createDiv(
+			"tags-element"
+		);
+        //tagsEl.style.textAlign = 'right'
+        tagsEl.style.marginBottom = '5%'
+
+        let tagNumber = 0;
+
+        new Setting(tagsEl)
+            .setHeading()
+            .setName("Tags")
+            .addButton((btn) => 
+                btn
+                .setButtonText("New tag")
+                .setClass("new-tag-button")
+                .setCta()
+                .onClick(() => {
+                    if (modifiedObj.Tags != undefined && modifiedObj.Tags.length > tagNumber) {
+                        modifiedObj.Tags.push("")
+                    } else {
+                        modifiedObj.Tags = [""]
                     }
-
-                    loadTags(this.app, tags).then(() => {
-                        new MDBEditTags(
-                            this.app,
-                            tags
-                        ).open()
-                    })
+                    createTagDiv(isEdit, tagsEl, modifiedObj, tagNumber++)
                 })
-			});
+            )
 
 		///===============
 		// Categories and songs:
@@ -178,6 +178,7 @@ export class MDBEditArtist extends Modal {
 		const buttonEl = this.contentEl.createDiv(
 			"cat-button-element"
 		);
+        buttonEl.style.marginTop = '2%'
 		buttonEl.style.textAlign = 'right'
 
         let catNumber = 0;
