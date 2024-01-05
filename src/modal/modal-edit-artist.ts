@@ -1,4 +1,4 @@
-import { App, ButtonComponent, Modal, Setting } from 'obsidian';
+import { App, ButtonComponent, Modal, Setting, TFile, Notice } from 'obsidian';
 import { createCategoryDiv } from './components/create-category-div'; 
 import { Database } from 'src/main';
 import { MDBEditTags } from './modal-edit-tags';
@@ -60,9 +60,9 @@ export class MDBEditArtist extends Modal {
                 if (modifiedObj.Description != undefined && modifiedObj.Description != "") {
                     this.noteDesc = modifiedObj.Description + "<br />"
                 }
-                if (modifiedObj.Tag != undefined && modifiedObj.Tag != "") {
-                    this.noteDesc = this.noteDesc + "<br />" + modifiedObj.Tag + "<br />"
-                }
+                //if (modifiedObj.Tags != undefined && modifiedObj.Tags != "") {
+                //    this.noteDesc = this.noteDesc + "<br />" + modifiedObj.Tags + "<br />"
+                //}
                 if (modifiedObj.Contents != undefined) {
                     modifiedObj.Contents.forEach((e) => {
                         if (e.Category != "") {
@@ -75,7 +75,6 @@ export class MDBEditArtist extends Modal {
                         })
                     })
                 }
-
 
                 // Change the json file:
                 const filesArray = this.app.vault.getFiles();
@@ -100,7 +99,6 @@ export class MDBEditArtist extends Modal {
                 const mdFile = filesArray.filter(e => e.name === this.artistName + '.md')[0]
                 this.app.vault.delete(mdFile)
 
-                // Close the window:
                 this.close();
                 this.onSubmit(
                     this.noteName, 
@@ -147,9 +145,30 @@ export class MDBEditArtist extends Modal {
             })
 			.addExtraButton((btn) => {
                 btn.onClick(() => {
-                    new MDBEditTags(
-                        this.app
-                    ).open()
+                    let tags = ["### No tags yet! ###"]
+
+                    async function loadTags(app: App, tags: string[]) {
+                        const filesArray = app.vault.getFiles();
+
+                        if (filesArray.some((e: TFile) => e.name === 'tags.json')) {
+                            let tagsFile = filesArray.filter((e: TFile) => e.name === 'tags.json')[0]
+                            let tagsFileContent = await app.vault.read(tagsFile)            
+                            try { 
+                                tags = JSON.parse(tagsFileContent)
+                            } catch {
+                                new Notice(`tags.json file is corrupted!`);
+                            }
+                        } else {
+                            app.vault.create('tags.json', '')
+                        }
+                    }
+
+                    loadTags(this.app, tags).then(() => {
+                        new MDBEditTags(
+                            this.app,
+                            tags
+                        ).open()
+                    })
                 })
 			});
 
