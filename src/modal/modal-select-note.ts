@@ -31,11 +31,14 @@ export class MDBSelectNote extends FuzzySuggestModal<Database> {
 			this.app, 
 			this.databaseObj, 
 			note.Name, 
-			(noteName, noteDesc) => {
+			// async is used because newNote is of promise type
+			async (noteName, noteDesc) => {
 				// Create a new note with the inputed title and content:
-				this.app.vault.create(`${noteName}.md`, noteDesc)
+				const newNote = await this.app.vault.create(`${noteName}.md`, noteDesc)
 				// Display a pop-up notice when the note is created:
 				new Notice(`Note "${noteName}" created!`);
+				// Open created note
+				this.app.workspace.getLeaf(true).openFile(newNote)
 			}
 		).open()
 	}
