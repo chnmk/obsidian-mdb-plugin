@@ -11,10 +11,10 @@ export const createTagDiv = (
 	const currentDiv = div.createDiv(
 		"tag-" + tagNumber
 	);
-    const displayedNumebr = tagNumber + 1
+    const displayedNum = tagNumber + 1
 
 	new Setting(currentDiv)
-		.setName("Tag #" + displayedNumebr)
+		.setName("Tag #" + displayedNum)
 		.addText((text) => {
 			if (isEdit && obj.Tags != undefined) {
 				text.setValue(obj.Tags[tagNumber])
@@ -22,7 +22,9 @@ export const createTagDiv = (
 			text.onChange((value) => {
 				if (obj.Tags != undefined) {
 					obj.Tags[tagNumber] = value
+					console.log(obj.Tags)
+					console.log(tagNumber)
 				}
-				})
+			})
 		});
 }

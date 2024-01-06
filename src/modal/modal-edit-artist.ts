@@ -62,8 +62,11 @@ export class MDBEditArtist extends Modal {
                 }
                 if (modifiedObj.Tags != undefined) {
                     this.noteDesc = this.noteDesc + "<br />"
-                    modifiedObj.Tags.forEach((t) => {
-                        this.noteDesc = this.noteDesc + "#" + t + " "
+                    console.log(modifiedObj.Tags)
+                    modifiedObj.Tags.forEach((t, idx) => {
+                        console.log("#" + idx + ": " + t)
+                        const t_underscore = t.split(' ').join('_')
+                        this.noteDesc = this.noteDesc + "#" + t_underscore + " "
                     })
                     this.noteDesc = this.noteDesc + "<br />"
                 }
@@ -87,10 +90,13 @@ export class MDBEditArtist extends Modal {
                 newDatabase = newDatabase .filter(x => x.Name != modifiedObj.Name);
                 newDatabase = newDatabase.filter(x => x.Name != "### New Artist ###");
 
-                // Remove empty categories, then push and sort
+                // Remove empty categories and tags, then push and sort
                 if (modifiedObj.Contents != undefined) {
                     modifiedObj.Contents.forEach(cat => cat.Songs.filter(s => s != ""))
                     modifiedObj.Contents = modifiedObj.Contents.filter(cat => (cat.Songs.length != 1 || cat.Songs[0] != "") || cat.Category != "")
+                }
+                if (modifiedObj.Tags != undefined) {
+                    modifiedObj.Tags.filter(t => t != "")
                 }
                 newDatabase.push(modifiedObj)
                 newDatabase.sort((a, b) => a.Name.localeCompare(b.Name));
@@ -149,7 +155,6 @@ export class MDBEditArtist extends Modal {
         const tagsEl = artistInfo.createDiv(
 			"tags-element"
 		);
-        //tagsEl.style.textAlign = 'right'
         tagsEl.style.marginBottom = '5%'
 
         let tagNumber = 0;
@@ -163,7 +168,7 @@ export class MDBEditArtist extends Modal {
                 .setClass("new-tag-button")
                 .setCta()
                 .onClick(() => {
-                    if (modifiedObj.Tags != undefined && modifiedObj.Tags.length > tagNumber) {
+                    if (modifiedObj.Tags != undefined && modifiedObj.Tags.length >= tagNumber) {
                         modifiedObj.Tags.push("")
                     } else {
                         modifiedObj.Tags = [""]
@@ -187,7 +192,7 @@ export class MDBEditArtist extends Modal {
 			.setButtonText("New category")
 			.setCta()
 			.onClick(() => {
-                if (modifiedObj.Contents != undefined && modifiedObj.Contents.length > catNumber) {
+                if (modifiedObj.Contents != undefined && modifiedObj.Contents.length >= catNumber) {
                     modifiedObj.Contents.push({ Category: "", Songs: [""]})
                 } else {
                     modifiedObj.Contents = [{ Category: "", Songs: [""]}]
