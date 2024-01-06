@@ -62,11 +62,11 @@ export class MDBEditArtist extends Modal {
                 }
                 if (modifiedObj.Tags != undefined) {
                     this.noteDesc = this.noteDesc + "<br />"
-                    console.log(modifiedObj.Tags)
-                    modifiedObj.Tags.forEach((t, idx) => {
-                        console.log("#" + idx + ": " + t)
-                        const t_underscore = t.split(' ').join('_')
-                        this.noteDesc = this.noteDesc + "#" + t_underscore + " "
+                    modifiedObj.Tags.forEach((t) => {
+                        if (t != "") {
+                            const t_underscore = t.split(' ').join('_')
+                            this.noteDesc = this.noteDesc + "#" + t_underscore + " "
+                        }
                     })
                     this.noteDesc = this.noteDesc + "<br />"
                 }
@@ -96,7 +96,7 @@ export class MDBEditArtist extends Modal {
                     modifiedObj.Contents = modifiedObj.Contents.filter(cat => (cat.Songs.length != 1 || cat.Songs[0] != "") || cat.Category != "")
                 }
                 if (modifiedObj.Tags != undefined) {
-                    modifiedObj.Tags.filter(t => t != "")
+                    modifiedObj.Tags = modifiedObj.Tags.filter(t => t != "")
                 }
                 newDatabase.push(modifiedObj)
                 newDatabase.sort((a, b) => a.Name.localeCompare(b.Name));
