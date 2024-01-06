@@ -1,5 +1,5 @@
 import { Plugin, Notice } from 'obsidian';
-import { MDBSelectArtist } from './modal/modal-select-artist';
+import { MDBSelectNote } from './modal/modal-select-note';
 
 // https://docs.obsidian.md/
 // Obsidian developer tools: ctrl + shift + i.
@@ -11,7 +11,7 @@ export type Database = {
 	Tags?: string[];
 	Contents?: {
 		Category: string;
-		Songs: string[];
+		Entries: string[];
 	}[]
 }
 
@@ -19,9 +19,9 @@ export type Database = {
 export default class MDBPlugin extends Plugin {
 	async onload() {
 		// Add an icon in the side bar:
-		this.addRibbonIcon('file-volume', 'MusicDB Plugin', async (evt: MouseEvent) => {
+		this.addRibbonIcon('file-volume', 'MDB Plugin', async (evt: MouseEvent) => {
 			// Notify user when the plugin starts:
-			new Notice(`MusicDB plugin starting...`);
+			new Notice(`MDB plugin starting...`);
 
 			// Check if database.json exists:
 			const filesArray = this.app.vault.getFiles();
@@ -35,20 +35,20 @@ export default class MDBPlugin extends Plugin {
 				try { 
 					// If database.json exists and is of Database[] type:
 					databaseObj = JSON.parse(databaseFileContent)
-					databaseObj.unshift({Name: "### New Artist ###"})
+					databaseObj.unshift({Name: "### New Note ###"})
 				} catch {
 					// If database.json exists but isn't a Database[]:
 					new Notice(`database.json file is corrupted!`);
-					databaseObj = [{Name: "### New Artist ###"}]
+					databaseObj = [{Name: "### New Note ###"}]
 				}
-				// Open the artist selection window:
-				new MDBSelectArtist(this.app, databaseObj).open()
+				// Open the note selection window:
+				new MDBSelectNote(this.app, databaseObj).open()
 
 			} else {
 				// If database.json doesn't exist:
 				this.app.vault.create('database.json', '')
-				let databaseObj: Database[] = [{Name: "### New Artist ###"}]
-				new MDBSelectArtist(this.app, databaseObj).open()
+				let databaseObj: Database[] = [{Name: "### New Note ###"}]
+				new MDBSelectNote(this.app, databaseObj).open()
 			}
 		});
 	}

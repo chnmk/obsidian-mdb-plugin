@@ -1,8 +1,8 @@
 {
 	"id": "mdb-plugin",
-	"name": "Music Data Base Plugin",
+	"name": "JSON Database Plugin",
 	"version": "0.1.0",
 	"minAppVersion": "0.15.0",
-	"description": "Take notes about your favourite music.",
+	"description": "Note builder with JSON conversion.",
 	"isDesktopOnly": false
 }

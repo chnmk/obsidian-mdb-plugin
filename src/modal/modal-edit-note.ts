@@ -3,12 +3,12 @@ import { createCategoryDiv } from './components/create-category-div';
 import { createTagDiv } from './components/create-tag-div';
 import { Database } from 'src/main';
 
-// This window opens when the "Add song" button in modal-select is clicked:
-export class MDBEditArtist extends Modal {
+// This window opens when the "New Note" button in modal-select-note is clicked:
+export class MDBEditNote extends Modal {
     // Arguments recieved from the select window:
 	noteName: string;
 	noteDesc: string;
-    artistName: string;
+    selectedName: string;
     databaseObj: Database[];
 	onSubmit: (noteName: string, noteDesc: string) => void;
 
@@ -21,18 +21,18 @@ export class MDBEditArtist extends Modal {
             super(app);
             this.onSubmit = onSubmit;
             this.databaseObj = databaseObj
-            this.artistName = artistName
+            this.selectedName = artistName
 	    }
   
 	onOpen() {
 		// Set the main div of the modal window:
 		const { contentEl } = this;
-        const isEdit = this.artistName != "### New Artist ###"
+        const isEdit = this.selectedName != "### New Note ###"
         let modifiedObj: Database;
 
         // Create the main object:
         if (isEdit) {
-            const currentObj = this.databaseObj.filter(x => x.Name === this.artistName)[0];
+            const currentObj = this.databaseObj.filter(x => x.Name === this.selectedName)[0];
             modifiedObj = currentObj
         } else {
             modifiedObj = { Name: "" }
@@ -42,7 +42,7 @@ export class MDBEditArtist extends Modal {
 		// Main header, submit-button div:
 		new Setting(contentEl)
 			.setHeading()
-			.setName("Adding new artist...")
+			.setName("Adding new note...")
 
 		const submitButtonEl = this.contentEl.createDiv(
 			"submit-button-element"
@@ -71,13 +71,13 @@ export class MDBEditArtist extends Modal {
                     this.noteDesc = this.noteDesc + "<br />"
                 }
                 if (modifiedObj.Contents != undefined) {
-                    modifiedObj.Contents.forEach((e) => {
-                        if (e.Category != "") {
-                            this.noteDesc = this.noteDesc + "<br />**" + e.Category + "**<br />"
+                    modifiedObj.Contents.forEach((c) => {
+                        if (c.Category != "") {
+                            this.noteDesc = this.noteDesc + "<br />**" + c.Category + "**<br />"
                         }
-                        e.Songs.forEach((s) => {
-                            if (s != "") {
-                                this.noteDesc = this.noteDesc + "- " + s + "<br />"
+                        c.Entries.forEach((e) => {
+                            if (e != "") {
+                                this.noteDesc = this.noteDesc + "- " + e + "<br />"
                             }
                         })
                     })
@@ -86,14 +86,14 @@ export class MDBEditArtist extends Modal {
                 // Change the json file:
                 const filesArray = this.app.vault.getFiles();
 
-                let newDatabase = this.databaseObj.filter(x => x.Name != this.artistName);
+                let newDatabase = this.databaseObj.filter(x => x.Name != this.selectedName);
                 newDatabase = newDatabase .filter(x => x.Name != modifiedObj.Name);
-                newDatabase = newDatabase.filter(x => x.Name != "### New Artist ###");
+                newDatabase = newDatabase.filter(x => x.Name != "### New Note ###");
 
                 // Remove empty categories and tags, then push and sort
                 if (modifiedObj.Contents != undefined) {
-                    modifiedObj.Contents.forEach(cat => cat.Songs.filter(s => s != ""))
-                    modifiedObj.Contents = modifiedObj.Contents.filter(cat => (cat.Songs.length != 1 || cat.Songs[0] != "") || cat.Category != "")
+                    modifiedObj.Contents.forEach(cat => cat.Entries.filter(s => s != ""))
+                    modifiedObj.Contents = modifiedObj.Contents.filter(cat => (cat.Entries.length != 1 || cat.Entries[0] != "") || cat.Category != "")
                 }
                 if (modifiedObj.Tags != undefined) {
                     modifiedObj.Tags = modifiedObj.Tags.filter(t => t != "")
@@ -106,7 +106,7 @@ export class MDBEditArtist extends Modal {
                 this.app.vault.modify(databaseFile, JSON.stringify(newDatabase))
 
                 // Remove old .md file if needed: 
-                const mdFile = filesArray.filter(e => e.name === this.artistName + '.md')[0]
+                const mdFile = filesArray.filter(e => e.name === this.selectedName + '.md')[0]
                 this.app.vault.delete(mdFile)
 
                 this.close();
@@ -116,18 +116,18 @@ export class MDBEditArtist extends Modal {
                     );
 			})
 		///===============
-		// Artist-info div:
+		// Note-info div:
 
-		const artistInfo = contentEl.createDiv(
-			"artist-info"
+		const noteInfo = contentEl.createDiv(
+			"note-info"
 		);	
 
-		new Setting(artistInfo)
+		new Setting(noteInfo)
 			.setName("Info")
 			.setHeading()
 
-		new Setting(artistInfo)
-			.setName("Artist name")
+		new Setting(noteInfo)
+			.setName("Note name")
 			.addText((text) => {
                 if (isEdit) {
                     text.setValue(modifiedObj.Name)
@@ -137,7 +137,7 @@ export class MDBEditArtist extends Modal {
                 })
             });
 
-		new Setting(artistInfo)
+		new Setting(noteInfo)
 			.setName("Description")
 			.addText((text) => {
                 if (isEdit && modifiedObj.Description != undefined) {
@@ -152,7 +152,7 @@ export class MDBEditArtist extends Modal {
 		///===============
 		// Tags:
 
-        const tagsEl = artistInfo.createDiv(
+        const tagsEl = noteInfo.createDiv(
 			"tags-element"
 		);
         tagsEl.style.marginBottom = '5%'
@@ -193,11 +193,11 @@ export class MDBEditArtist extends Modal {
 			.setCta()
 			.onClick(() => {
                 if (modifiedObj.Contents != undefined && modifiedObj.Contents.length >= catNumber) {
-                    modifiedObj.Contents.push({ Category: "", Songs: [""]})
+                    modifiedObj.Contents.push({ Category: "", Entries: [""]})
                 } else {
-                    modifiedObj.Contents = [{ Category: "", Songs: [""]}]
+                    modifiedObj.Contents = [{ Category: "", Entries: [""]}]
                 }
-				createCategoryDiv(isEdit, artistInfo, modifiedObj, catNumber++)
+				createCategoryDiv(isEdit, noteInfo, modifiedObj, catNumber++)
 			});
 	}
   
