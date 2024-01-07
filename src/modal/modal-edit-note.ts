@@ -1,6 +1,6 @@
 import { App, ButtonComponent, Modal, Setting } from 'obsidian';
-import { createCategoryInput } from './input-fields/create-category-input'; 
-import { createTagInput } from './input-fields/create-tag-input';
+import { createCategoryInput } from '../input/create-category-input'; 
+import { createTagInput } from '../input/create-tag-input';
 import { Database } from 'src/main';
 
 // This window opens when any option in modal-select-note is selected:
