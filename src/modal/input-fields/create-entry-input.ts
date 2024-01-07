@@ -1,11 +1,7 @@
 import { Setting } from 'obsidian';
 import { Database } from 'src/main';
 
-/*
-	Function to create a new song number 'num' in the current category,
-	on the 'div' div of the modal window.
-	The input will be added to the 'entries' section of the note.
-*/
+// This function is used when the "New entry" button is clicked:
 export const createEntryInput = (
 	isEdit: boolean,
 	div: HTMLElement, 
@@ -14,8 +10,13 @@ export const createEntryInput = (
 	entryNumber: number,
 	) => {
 	
+	/*
+	No separate div is needed 
+	since the new entry inputs are added to a parent category div.
+	*/
+
+	// Create new input:
 	const displayedNum = entryNumber+1
-	
 	new Setting(div)
 		.setName("Entry #" + displayedNum)
 		.addText((text) => {

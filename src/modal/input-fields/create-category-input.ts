@@ -2,20 +2,22 @@ import { Setting } from 'obsidian';
 import { createEntryInput } from './create-entry-input';
 import { Database } from 'src/main';
 
-export const createCategoryDiv = (
+// This function is used when the "New Category" button is clicked:
+export const createCategoryInput = (
 	isEdit: boolean,
 	div: HTMLElement, 
 	obj: Database,
 	catNumber: number,
 	) => {
 	
+	// Create a separate div for the new category:
 	const currentDiv = div.createDiv(
 		"category-" + catNumber
 	);
 
+	// Create a "New entry" button for this category:
 	const displayedNum = catNumber+1
 	let entryNumber = 0
-
 	new Setting(currentDiv)
 		.setHeading()
 		.setName("Category " + displayedNum)
@@ -28,6 +30,7 @@ export const createCategoryDiv = (
 			})
 		);
 
+	// Create a input field for the current category name:
 	new Setting(currentDiv)
 		.setName("Category name")
 		.addText((text) => {
@@ -41,5 +44,6 @@ export const createCategoryDiv = (
 				})
 		});
 
+	// Automatically create the first entry field for this category:
 	createEntryInput(isEdit, currentDiv, obj, catNumber, entryNumber++)
 }

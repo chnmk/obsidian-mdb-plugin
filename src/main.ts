@@ -1,9 +1,6 @@
 import { Plugin, Notice } from 'obsidian';
 import { MDBSelectNote } from './modal/modal-select-note';
 
-// https://docs.obsidian.md/
-// Obsidian developer tools: ctrl + shift + i.
-
 // Declare type for the database.json file:
 export type Database = {
 	Name: string;

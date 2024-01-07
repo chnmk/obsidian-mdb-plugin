@@ -1,9 +1,9 @@
 import { App, ButtonComponent, Modal, Setting } from 'obsidian';
-import { createCategoryDiv } from './components/create-category-div'; 
-import { createTagDiv } from './components/create-tag-div';
+import { createCategoryInput } from './input-fields/create-category-input'; 
+import { createTagInput } from './input-fields/create-tag-input';
 import { Database } from 'src/main';
 
-// This window opens when the "New Note" button in modal-select-note is clicked:
+// This window opens when any option in modal-select-note is selected:
 export class MDBEditNote extends Modal {
     // Arguments recieved from the select window:
 	noteName: string;
@@ -44,37 +44,47 @@ export class MDBEditNote extends Modal {
 			.setHeading()
 			.setName("Adding new note...")
 
+        // Submit button div:
 		const submitButtonEl = this.contentEl.createDiv(
 			"submit-button-element"
 		);
 		submitButtonEl.style.marginBottom = '5%'
 
+        // Submit button:
 		new ButtonComponent(submitButtonEl)
 			.setButtonText("Submit")
 			.setCta()
 			.onClick(() => {
-                // Final contents of the file:
+                // Final contents of the new note:
                 this.noteName = modifiedObj.Name
                 this.noteDesc = ""
 
+                // Set note description:
                 if (modifiedObj.Description != undefined && modifiedObj.Description != "") {
                     this.noteDesc = modifiedObj.Description + "<br />"
                 }
+
+                // Set note tags:
                 if (modifiedObj.Tags != undefined) {
                     this.noteDesc = this.noteDesc + "<br />"
                     modifiedObj.Tags.forEach((t) => {
                         if (t != "") {
+                            // Replace spaces with underscores for obsidian tags: 
                             const t_underscore = t.split(' ').join('_')
                             this.noteDesc = this.noteDesc + "#" + t_underscore + " "
                         }
                     })
                     this.noteDesc = this.noteDesc + "<br />"
                 }
+
+                // Set note categories and entries:
                 if (modifiedObj.Contents != undefined) {
+                    // Set categories:
                     modifiedObj.Contents.forEach((c) => {
                         if (c.Category != "") {
                             this.noteDesc = this.noteDesc + "<br />**" + c.Category + "**<br />"
                         }
+                        // Set entries:
                         c.Entries.forEach((e) => {
                             if (e != "") {
                                 this.noteDesc = this.noteDesc + "- " + e + "<br />"
@@ -109,23 +119,26 @@ export class MDBEditNote extends Modal {
                 const mdFile = filesArray.filter(e => e.name === this.selectedName + '.md')[0]
                 this.app.vault.delete(mdFile)
 
+                // Submit the new note:
                 this.close();
                 this.onSubmit(
                     this.noteName, 
                     this.noteDesc
                     );
 			})
+
 		///===============
 		// Note-info div:
-
 		const noteInfo = contentEl.createDiv(
 			"note-info"
 		);	
 
+        // Header:
 		new Setting(noteInfo)
 			.setName("Info")
 			.setHeading()
 
+        // Note name input:
 		new Setting(noteInfo)
 			.setName("Note name")
 			.addText((text) => {
@@ -137,6 +150,7 @@ export class MDBEditNote extends Modal {
                 })
             });
 
+        // Note description input:
 		new Setting(noteInfo)
 			.setName("Description")
 			.addText((text) => {
@@ -150,54 +164,57 @@ export class MDBEditNote extends Modal {
 
 
 		///===============
-		// Tags:
-
+		// Tags div:
         const tagsEl = noteInfo.createDiv(
 			"tags-element"
 		);
         tagsEl.style.marginBottom = '5%'
 
-        let tagNumber = 0;
 
+        // New tag button:
+        let tagNumber = 0;
         new Setting(tagsEl)
             .setHeading()
             .setName("Tags")
             .addButton((btn) => 
                 btn
                 .setButtonText("New tag")
-                .setClass("new-tag-button")
+                .setClass("new-tag-button") // styles.css
                 .setCta()
                 .onClick(() => {
+                    // When the button is clicked, push a new string to the tags array:  
                     if (modifiedObj.Tags != undefined && modifiedObj.Tags.length >= tagNumber) {
                         modifiedObj.Tags.push("")
                     } else {
                         modifiedObj.Tags = [""]
                     }
-                    createTagDiv(isEdit, tagsEl, modifiedObj, tagNumber++)
+                    // Then create a new tag input:
+                    createTagInput(isEdit, tagsEl, modifiedObj, tagNumber++)
                 })
             )
 
 		///===============
-		// Categories and songs:
-
+		// Categories and songs div:
 		const buttonEl = this.contentEl.createDiv(
 			"cat-button-element"
 		);
         buttonEl.style.marginTop = '2%'
 		buttonEl.style.textAlign = 'right'
 
+        // New category button:
         let catNumber = 0;
-
 		new ButtonComponent(buttonEl)
 			.setButtonText("New category")
 			.setCta()
 			.onClick(() => {
+                // When the button is clicked, push a new object to the contents array:  
                 if (modifiedObj.Contents != undefined && modifiedObj.Contents.length >= catNumber) {
                     modifiedObj.Contents.push({ Category: "", Entries: [""]})
                 } else {
                     modifiedObj.Contents = [{ Category: "", Entries: [""]}]
                 }
-				createCategoryDiv(isEdit, noteInfo, modifiedObj, catNumber++)
+                // Then create a new category input:
+				createCategoryInput(isEdit, noteInfo, modifiedObj, catNumber++)
 			});
 	}
   
