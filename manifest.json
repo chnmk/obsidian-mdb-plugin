@@ -1,8 +1,8 @@
 {
-	"id": "mdb-plugin",
-	"name": "JSON Database Plugin",
-	"version": "0.1.0",
-	"minAppVersion": "0.15.0",
-	"description": "Note builder with JSON conversion.",
-	"isDesktopOnly": false
+  "id": "mdb-plugin",
+  "name": "JSON Database Plugin",
+  "version": "0.1.0",
+  "minAppVersion": "0.15.0",
+  "description": "Manual note builder with JSON conversion.",
+  "isDesktopOnly": false
 }

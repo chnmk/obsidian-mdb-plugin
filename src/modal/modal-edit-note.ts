@@ -157,7 +157,7 @@ export class MDBEditNote extends Modal {
     });
 
     // Note description input:
-    new Setting(noteInfo).setName("Description").addText((text) => {
+    new Setting(noteInfo).setName("Description").addTextArea((text) => {
       if (isEdit && modifiedObj.Description != undefined) {
         text.setValue(modifiedObj.Description);
       }
